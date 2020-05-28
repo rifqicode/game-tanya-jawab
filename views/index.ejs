@@ -104,9 +104,12 @@
 
   <script>
     $(document).ready(function() {
-      let socket = io(),
-          gameButton = $('#game-button');
+      let socket = io();
+      let gameButton = $('#game-button');
+      let token = "<%=token %>";
+      let getCurrentToken = localStorage.getItem('token');
 
+      // animate
       gameButton.addClass('animate__animated');
       gameButton.addClass('animate__bounce');
 
@@ -124,6 +127,13 @@
         element.removeClass('animate__animated');
         element.removeClass('animate__bounce');
       });
+      //  end animate
+
+      // start game
+      if (getCurrentToken) {
+        token = getCurrentToken;
+      }
+      localStorage.setItem('token', token);
 
       $(document).on('click', '#game-button', function() {
         $('#modal-register').modal();
@@ -134,9 +144,12 @@
         if (!username) {
           swal("Oopss!", "Lengkapi username anda terlebih dahulu!", "warning");
         }
-        socket.emit('join-game', $('#username').val());
 
-        window.location = 
+        socket.emit('join-game', {
+          username: username,
+          token: token
+        });
+        window.location = '/play';
       });
     });
   </script>

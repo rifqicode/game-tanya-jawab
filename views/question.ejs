@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title> Selamat Datang Di simple-question-game </title>
+  </head>
+
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/main.css" rel="stylesheet">
+  <link href="css/cover.css" rel="stylesheet">
+
+  <style media="screen">
+
+  </style>
+
+  <body class="game-body">
+    <section class="jumbotron header-app text-center col-md-4" style="background-color:#94545b;height:100%;">
+      <div class="container">
+        <h1>Selamat datang</h1>
+        <p class="lead"> List pemain </p>
+        <ul class="text-left" id="list-pemain">
+        </ul>
+
+        <div class="col-md-12" style="margin-top:50%;">
+          <p> Jawab </p>
+
+          <div class="col-md-12" style="border:1;background-color:white;max-height:50%;height:400px;;">
+            <p>asdk aksdo</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="jumbotron header-app text-center col-md-8" style="background-color:#333;height:100%;">
+      <div class="container">
+        <h4> 00:00 </h4>
+
+        <br><hr>
+        <div class="row col-md-12">
+
+          <div class="col-md-7">
+            <div class="col-md-12">
+              <h4> Pertanyaan </h4>
+              <hr>
+              <div class="col-md-12 text-center" style="margin-top:20%">
+                <h3>
+                  <i> <u>
+                    Apakah nama latin indonesia ??
+                  </u> </i>
+                </h3>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-5">
+            <div class="panel__image panel__image--book">
+              <a href="#" class="books__book__image">
+                <div class="books__book__img">
+                  <img src="https://d33wubrfki0l68.cloudfront.net/91ed41706514200a7ef212ebfeead7471354e622/01dcc/images/books/design-systems--large-opt.png">
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/socket.io-client@2/dist/socket.io.js" charset="utf-8"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js" charset="utf-8"></script>
+    <script>
+      var socket = io();
+
+      socket.on('user-list', function(msg) {
+        $('#list-pemain').append($('<li>').text(msg));
+      });
+    </script>
+  </body>
+</html>
