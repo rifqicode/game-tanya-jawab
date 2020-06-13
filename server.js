@@ -7,7 +7,8 @@ const bodyParser = require('body-parser');
 const ejs = require('ejs');
 const randomstring = require('randomstring');
 const MongoClient = require('mongodb').MongoClient;
-const connectionString = 'mongodb://rifqi:kepolu123@127.0.0.1:27017';
+// const connectionString = 'mongodb://rifqi:kepolu123@127.0.0.1:27017';
+const connectionString = 'mongodb://127.0.0.1:27017';
 
 express.use('/public/', app.static(__dirname + '/public'));
 express.use('/module/', app.static(__dirname + '/node_modules'));
@@ -40,26 +41,36 @@ MongoClient.connect(connectionString, {useUnifiedTopology: true})
         body['status'] = 1;
 
         userCollection.insertOne(body).then((result) => {
-          res.render('question', {_token: generateToken });
+          res.redirect('/game?token=' + generateToken);
         }).catch((err) => {
+          res.redirect('/');
+        });
+    });
+
+    express.get('/game', (req, res) => {
+        var token = req.query.token;
+
+        userCollection.findOne({token: token}).then((result) => {
+          res.render('question', {user: result});
+        }).catch((error) => {
           res.redirect('/');
         });
     });
 
     // socket io
     io.on('connection', (socket) => {
-        console.log('someone connected' + socket.id);
-
         socket.on('disconnect', () => {
           console.log('user disconnected');
         });
 
         socket.on('join-game' , (data) => {
-          var text = 'user join game with name : ' + data.username;
-          io.emit('user-list', data.username);
+          userCollection.find({status: 1}).toArray(function(err, result) {
+              io.emit('user-list', result);
+          });
         });
     });
     // end socket io
+
   }).catch((err) => {
     console.log(err);
   });

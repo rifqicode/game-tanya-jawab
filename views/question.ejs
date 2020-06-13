@@ -18,7 +18,7 @@
       <div class="container">
         <h1>Selamat datang</h1>
         <p class="lead"> List pemain </p>
-        <ul class="text-left" id="list-pemain">
+        <ul class="text-left" id="player-list">
         </ul>
 
         <div class="col-md-12" style="margin-top:50%;">
@@ -69,9 +69,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js" charset="utf-8"></script>
     <script>
       var socket = io();
+      var user = <%- JSON.stringify(user) %>
 
-      socket.on('user-list', function(msg) {
-        $('#list-pemain').append($('<li>').text(msg));
+      socket.emit('join-game', user);
+      socket.on('user-list', function(data) {
+        $.each(data, (key, value) => {
+          var playerCheck = $(`#${value._id}`).length;
+          if (playerCheck == 0) {
+            $('#player-list').append($(`<li id='${value._id}'>`).text(value.name));
+          }
+        });
       });
     </script>
   </body>
