@@ -20,7 +20,7 @@
 
         <div class="col-md-12">
           <h3 class="lead"> Player </h3>
-          <ul class="text-left player-list" id="player-list">
+          <ul class="text-left player-list" id="player-list" style="overflow-y:scroll;height:30%;">
             <!-- list player -->
           </ul>
         </div>
@@ -57,12 +57,11 @@
           <h4> GAME TANYA JAWAB </h4>
         </div>
 
-        <div class="col-md-12">
-
+        <div class="col-md-12" id='game-ready-content'>
           <div class="col-md-12">
             <div class="col-md-12" style="margin-top:30%">
             <div class="col-md-12">
-              <p> Game akan dimulai jika seluruh pemain ready </p>
+              <p id="game-notice"> Game akan dimulai jika seluruh pemain ready </p>
             </div>
               <button type="button" class="btn btn-success" name="button" id="ready-state"> SIAP </button>
             </div>
@@ -77,11 +76,7 @@
         var socket = io();
         var user = <%- JSON.stringify(user) %>
         let ready = parseInt(user.ready);
-
-
-        window.setInterval(function() {
-          console.log(ready);
-        }, 1000);
+        let gameCountDown = 10;
 
         socket.emit('join-game', user);
         socket.on('user-list', (data) => {
@@ -117,6 +112,19 @@
             }
         });
 
+        socket.on('user-all-ready', (data) => {
+            // start game
+        });
+
+        socket.on('user-all-notready', (data) => {
+            $('#game-notice').html('Game akan dimulai jika seluruh pemain ready');
+        });
+
+        socket.on('timer', (countdown) => {
+            // countdown
+            $('#game-notice').html('Game akan dimulai dalam : ' + countdown);
+        })
+
         $(document).on('submit', '#send-message-form', (event) => {
             event.preventDefault();
             var text = $('#text').val();
@@ -145,7 +153,6 @@
               $('#ready-state').html('SIAP');
             }
 
-            console.log(ready);
             socket.emit('ready', {user: user, ready: ready});
         });
 

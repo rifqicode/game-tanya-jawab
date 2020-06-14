@@ -64,7 +64,10 @@ MongoClient.connect(connectionString, {useUnifiedTopology: true})
 
     // socket io
     io.on('connection', (socket) => {
-        var token = '';
+        var token = '',
+            allReady = false,
+            countdown = 10;
+
         socket.on('disconnect', () => {
             var where = { token: token };
             var replace = { $set: {status: 0, ready: 0} };
@@ -89,12 +92,38 @@ MongoClient.connect(connectionString, {useUnifiedTopology: true})
           var where = { token: token };
           var replace = { $set: {ready: data.ready} };
           userCollection.updateOne(where, replace, function(err, res) {
-
             userCollection.findOne(where).then((result) => {
               io.emit('user-ready', result);
             });
+
+            userCollection.find({status: 1}).count().then((result) => {
+              let activeUser = result;
+              userCollection.find({status:1, ready:1}).count().then((result) => {
+                let readyUser = result;
+
+                if (activeUser == readyUser) {
+                  allReady = true;
+                  io.emit('user-all-ready');
+                } else {
+                  allReady = false;
+                  io.emit('user-all-notready');
+                }
+              });
+            });
           });
         });
+
+
+        setInterval(function() {
+          if (allReady == true) {
+            setInterval(function() {
+              io.emit('timer', countdown);
+              countdown--;
+            }, 1000);
+          } else {
+            countdown = 10;
+          }
+        }, 1000);
 
 
         socket.on('send-text', (data) => {
