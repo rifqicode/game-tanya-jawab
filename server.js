@@ -59,14 +59,32 @@ MongoClient.connect(connectionString, {useUnifiedTopology: true})
 
     // socket io
     io.on('connection', (socket) => {
+        var token = '';
         socket.on('disconnect', () => {
-          console.log('user disconnected');
+            var where = { token: token };
+            var replace = { $set: {status: 0} };
+            userCollection.updateOne(where, replace, (err, res) => {
+              console.log('someone disconnect');
+
+              io.emit('someone-disconnect', token);
+            });
         });
 
-        socket.on('join-game' , (data) => {
+        socket.on('player-list', () => {
           userCollection.find({status: 1}).toArray(function(err, result) {
               io.emit('user-list', result);
           });
+        });
+
+        socket.on('join-game' , (data) => {
+            token = data.token;
+            var where = { token: token };
+            var replace = { $set: {status: 1} };
+            userCollection.updateOne(where, replace, function(err, res) {
+              userCollection.find({status: 1}).toArray(function(err, result) {
+                  io.emit('user-list', result);
+              });
+            });
         });
     });
     // end socket io

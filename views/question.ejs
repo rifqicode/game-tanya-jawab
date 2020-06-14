@@ -68,18 +68,35 @@
     <script src="https://cdn.jsdelivr.net/npm/socket.io-client@2/dist/socket.io.js" charset="utf-8"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js" charset="utf-8"></script>
     <script>
-      var socket = io();
-      var user = <%- JSON.stringify(user) %>
+        var socket = io();
+        var user = <%- JSON.stringify(user) %>
 
-      socket.emit('join-game', user);
-      socket.on('user-list', function(data) {
-        $.each(data, (key, value) => {
-          var playerCheck = $(`#${value._id}`).length;
-          if (playerCheck == 0) {
-            $('#player-list').append($(`<li id='${value._id}'>`).text(value.name));
-          }
+        socket.emit('join-game', user);
+        socket.on('user-list', (data) => {
+            $.each(data, (key, value) => {
+              var playerCheck = $(`#${value.token}`).length;
+              if (playerCheck == 0) {
+                $('#player-list').append($(`<li id='${value.token}'>`).text(value.name));
+              }
+            });
         });
-      });
+
+        socket.on('someone-disconnect', (data) => {
+            var find = $('#player-list').find(`#${data}`);
+
+            find.remove();
+        });
+    </script>
+    <script type="text/javascript">
+        // window.addEventListener('beforeunload', function (e) {
+        //     e.preventDefault();
+        //     e.returnValue = '';
+        // });
+        //
+        // window.addEventListener('onunload', function(e) {
+        //     e.preventDefault();
+        //     socket.emit('disconnect-user', user);
+        // });
     </script>
   </body>
 </html>
