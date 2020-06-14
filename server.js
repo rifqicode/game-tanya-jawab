@@ -39,6 +39,7 @@ MongoClient.connect(connectionString, {useUnifiedTopology: true})
 
         body['token'] = generateToken;
         body['status'] = 1;
+        body['ready'] = 0;
 
         userCollection.insertOne(body).then((result) => {
           res.redirect('/game?token=' + generateToken);
@@ -66,18 +67,10 @@ MongoClient.connect(connectionString, {useUnifiedTopology: true})
         var token = '';
         socket.on('disconnect', () => {
             var where = { token: token };
-            var replace = { $set: {status: 0} };
+            var replace = { $set: {status: 0, ready: 0} };
             userCollection.updateOne(where, replace, (err, res) => {
-              console.log('someone disconnect');
-
-              io.emit('someone-disconnect', token);
+              io.emit('user-disconnect', token);
             });
-        });
-
-        socket.on('player-list', () => {
-          userCollection.find({status: 1}).toArray(function(err, result) {
-              io.emit('user-list', result);
-          });
         });
 
         socket.on('join-game' , (data) => {
@@ -91,8 +84,21 @@ MongoClient.connect(connectionString, {useUnifiedTopology: true})
             });
         });
 
+        socket.on('ready', (data) => {
+          token = data.user.token;
+          var where = { token: token };
+          var replace = { $set: {ready: data.ready} };
+          userCollection.updateOne(where, replace, function(err, res) {
+
+            userCollection.findOne(where).then((result) => {
+              io.emit('user-ready', result);
+            });
+          });
+        });
+
+
         socket.on('send-text', (data) => {
-            io.emit('someone-send-text', data);
+            io.emit('user-send-text', data);
         });
     });
     // end socket io

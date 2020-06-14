@@ -66,3 +66,11 @@
 body {
   overflow: hidden;
 }
+
+.player-list li {
+  padding: 5px;
+}
+
+.player-status {
+  margin-left: 5px;
+}

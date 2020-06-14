@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title> Selamat Datang Di simple-question-game </title>
+    <title> ONLINE CERDAS-CERMAT </title>
   </head>
 
   <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -20,13 +20,13 @@
 
         <div class="col-md-12">
           <h3 class="lead"> Player </h3>
-          <ul class="text-left" id="player-list">
+          <ul class="text-left player-list" id="player-list">
             <!-- list player -->
           </ul>
         </div>
 
         <div class="col-md-12" style="margin-top:70%">
-          <h5> Chating disini </h5>
+          <h5> Chating </h5>
 
           <div class="col-md-12 nopadding">
             <ul class="messages" id="list-message" style="overflow-y:scroll">
@@ -50,23 +50,21 @@
       </div>
     </section>
 
-    <section class="jumbotron header-app text-center col-md-8" style="background-color:#333;height:100%;">
+    <section class="jumbotron header-app text-center col-md-8" style="background-color:#333;height:100%;" id="game-content">
       <div class="container">
 
-        <div class="row col-md-12">
-          <div class="col-md-12">
-            <h4> 00:00 </h4>
-            <br><hr>
-          </div>
+        <div class="col-md-12">
+          <h4> GAME TANYA JAWAB </h4>
+        </div>
+
+        <div class="col-md-12">
 
           <div class="col-md-12">
-            <h4> Pertanyaan </h4>
-            <div class="col-md-12 text-center" style="margin-top:20%">
-              <h3>
-                <i> <u>
-                  Apakah nama latin indonesia ??
-                </u> </i>
-              </h3>
+            <div class="col-md-12" style="margin-top:30%">
+            <div class="col-md-12">
+              <p> Game akan dimulai jika seluruh pemain ready </p>
+            </div>
+              <button type="button" class="btn btn-success" name="button" id="ready-state"> SIAP </button>
             </div>
           </div>
         </div>
@@ -78,25 +76,45 @@
     <script>
         var socket = io();
         var user = <%- JSON.stringify(user) %>
+        let ready = parseInt(user.ready);
+
+
+        window.setInterval(function() {
+          console.log(ready);
+        }, 1000);
 
         socket.emit('join-game', user);
         socket.on('user-list', (data) => {
             $.each(data, (key, value) => {
               var playerCheck = $(`#${value.token}`).length;
               if (playerCheck == 0) {
-                $('#player-list').append($(`<li id='${value.token}'>`).text(value.name));
+                var templateUserActive = userActiveTemplace(value);
+                $('#player-list').append(templateUserActive);
               }
             });
         });
 
-        socket.on('someone-disconnect', (data) => {
+        socket.on('user-disconnect', (data) => {
             $('#player-list').find(`#${data}`).remove();
         });
 
-        socket.on('someone-send-text', (data) => {
+        socket.on('user-send-text', (data) => {
             var getMessageTemplate = message(data);
-
             $('#list-message').append(getMessageTemplate);
+        });
+
+        socket.on('user-ready' , (data) => {
+            var element = $(`#status${data._id}`);
+
+            if (data.ready > 0) {
+              element.removeClass('btn-danger');
+              element.addClass('btn-success');
+              element.html('SIAP')
+            } else {
+              element.addClass('btn-danger');
+              element.removeClass('btn-success');
+              element.html('BELUM SIAP')
+            }
         });
 
         $(document).on('submit', '#send-message-form', (event) => {
@@ -112,18 +130,49 @@
             $('#text').val('');
         });
 
-        function message(user) {
-          return `
-            <li class="message left appeared">
-              <div class="avatar">
-                <div class="player">
-                  <p> ${user.name} </p>
+        $(document).on('click', '#ready-state', () => {
+            var button = $('#ready-state');
+
+            if (ready == 0) {
+              ready = 1;
+              $('#ready-state').html('BELUM SIAP');
+              $('#ready-state').removeClass('btn-success');
+              $('#ready-state').addClass('btn-danger');
+            } else {
+              ready = 0;
+              $('#ready-state').addClass('btn-success');
+              $('#ready-state').removeClass('btn-danger');
+              $('#ready-state').html('SIAP');
+            }
+
+            console.log(ready);
+            socket.emit('ready', {user: user, ready: ready});
+        });
+
+        function message(data) {
+            return `
+              <li class="message left appeared">
+                <div class="avatar">
+                  <div class="player">
+                    <p> ${data.name} </p>
+                  </div>
                 </div>
-              </div>
-              <div class="text_wrapper">
-                <div class="text"> ${user.text} </div>
-              </div>
-            </li>`;
+                <div class="text_wrapper">
+                  <div class="text"> ${data.text} </div>
+                </div>
+              </li>`;
+        }
+
+        function userActiveTemplace(user) {
+            return `
+              <li id="${user.token}">
+                ${user.name}
+
+                <span id="status${user._id}" class="player-status btn ${user.ready > 0? 'btn-success' : 'btn-danger'} btn-sm">
+                  ${user.ready > 0? 'SIAP' : 'BELUM SIAP'}
+                </span>
+              </li>
+            `;
         }
     </script>
   </body>
