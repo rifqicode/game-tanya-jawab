@@ -8,24 +8,43 @@
   <link href="css/bootstrap.min.css" rel="stylesheet">
   <link href="css/main.css" rel="stylesheet">
   <link href="css/cover.css" rel="stylesheet">
+  <link href="css/chat.css" rel="stylesheet">
 
   <style media="screen">
 
   </style>
 
   <body class="game-body">
-    <section class="jumbotron header-app text-center col-md-4" style="background-color:#94545b;height:100%;">
+    <section class="jumbotron header-app col-md-4" style="background-color:#94545b;height:100%;">
       <div class="container">
-        <h1>Selamat datang</h1>
-        <p class="lead"> List pemain </p>
-        <ul class="text-left" id="player-list">
-        </ul>
 
-        <div class="col-md-12" style="margin-top:50%;">
-          <p> Jawab </p>
+        <div class="col-md-12">
+          <h3 class="lead"> Player </h3>
+          <ul class="text-left" id="player-list">
+            <!-- list player -->
+          </ul>
+        </div>
 
-          <div class="col-md-12" style="border:1;background-color:white;max-height:50%;height:400px;;">
-            <p>asdk aksdo</p>
+        <div class="col-md-12" style="margin-top:70%">
+          <h5> Chating disini </h5>
+
+          <div class="col-md-12 nopadding">
+            <ul class="messages" id="list-message" style="overflow-y:scroll">
+
+            </ul>
+          </div>
+          <br>
+
+          <div class="col-md-12">
+            <form id="send-message-form">
+              <div class="input-group">
+                <input type="text" class="form-control" id="text" placeholder="Chat..." aria-label="Username" aria-describedby="basic-addon1">
+                <div class="input-group-prepend">
+                  <button class="btn btn-success" type="submit" name="button"> Kirim </button>
+                </div>
+              </div>
+            </form>
+
           </div>
         </div>
       </div>
@@ -33,32 +52,21 @@
 
     <section class="jumbotron header-app text-center col-md-8" style="background-color:#333;height:100%;">
       <div class="container">
-        <h4> 00:00 </h4>
 
-        <br><hr>
         <div class="row col-md-12">
-
-          <div class="col-md-7">
-            <div class="col-md-12">
-              <h4> Pertanyaan </h4>
-              <hr>
-              <div class="col-md-12 text-center" style="margin-top:20%">
-                <h3>
-                  <i> <u>
-                    Apakah nama latin indonesia ??
-                  </u> </i>
-                </h3>
-              </div>
-            </div>
+          <div class="col-md-12">
+            <h4> 00:00 </h4>
+            <br><hr>
           </div>
 
-          <div class="col-md-5">
-            <div class="panel__image panel__image--book">
-              <a href="#" class="books__book__image">
-                <div class="books__book__img">
-                  <img src="https://d33wubrfki0l68.cloudfront.net/91ed41706514200a7ef212ebfeead7471354e622/01dcc/images/books/design-systems--large-opt.png">
-                </div>
-              </a>
+          <div class="col-md-12">
+            <h4> Pertanyaan </h4>
+            <div class="col-md-12 text-center" style="margin-top:20%">
+              <h3>
+                <i> <u>
+                  Apakah nama latin indonesia ??
+                </u> </i>
+              </h3>
             </div>
           </div>
         </div>
@@ -82,21 +90,41 @@
         });
 
         socket.on('someone-disconnect', (data) => {
-            var find = $('#player-list').find(`#${data}`);
-
-            find.remove();
+            $('#player-list').find(`#${data}`).remove();
         });
-    </script>
-    <script type="text/javascript">
-        // window.addEventListener('beforeunload', function (e) {
-        //     e.preventDefault();
-        //     e.returnValue = '';
-        // });
-        //
-        // window.addEventListener('onunload', function(e) {
-        //     e.preventDefault();
-        //     socket.emit('disconnect-user', user);
-        // });
+
+        socket.on('someone-send-text', (data) => {
+            var getMessageTemplate = message(data);
+
+            $('#list-message').append(getMessageTemplate);
+        });
+
+        $(document).on('submit', '#send-message-form', (event) => {
+            event.preventDefault();
+            var text = $('#text').val();
+            if (text) {
+              socket.emit('send-text', {
+                name: user.name,
+                text: text
+              });
+            }
+
+            $('#text').val('');
+        });
+
+        function message(user) {
+          return `
+            <li class="message left appeared">
+              <div class="avatar">
+                <div class="player">
+                  <p> ${user.name} </p>
+                </div>
+              </div>
+              <div class="text_wrapper">
+                <div class="text"> ${user.text} </div>
+              </div>
+            </li>`;
+        }
     </script>
   </body>
 </html>

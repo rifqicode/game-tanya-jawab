@@ -62,3 +62,7 @@
 .books__book__image:hover {
     position: relative;
 }
+
+body {
+  overflow: hidden;
+}

@@ -50,11 +50,15 @@ MongoClient.connect(connectionString, {useUnifiedTopology: true})
     express.get('/game', (req, res) => {
         var token = req.query.token;
 
-        userCollection.findOne({token: token}).then((result) => {
-          res.render('question', {user: result});
-        }).catch((error) => {
-          res.redirect('/');
-        });
+        if (token) {
+          userCollection.findOne({token: token}).then((result) => {
+            res.render('question', {user: result});
+          }).catch((error) => {
+            res.redirect('/');
+          });
+        }  else {
+          res.redirect('/')
+        }
     });
 
     // socket io
@@ -85,6 +89,10 @@ MongoClient.connect(connectionString, {useUnifiedTopology: true})
                   io.emit('user-list', result);
               });
             });
+        });
+
+        socket.on('send-text', (data) => {
+            io.emit('someone-send-text', data);
         });
     });
     // end socket io
