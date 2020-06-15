@@ -7,8 +7,10 @@ const bodyParser = require('body-parser');
 const ejs = require('ejs');
 const randomstring = require('randomstring');
 const MongoClient = require('mongodb').MongoClient;
-// const connectionString = 'mongodb://rifqi:kepolu123@127.0.0.1:27017';
-const connectionString = 'mongodb://127.0.0.1:27017';
+const connectionString = 'mongodb://rifqi:kepolu123@127.0.0.1:27017';
+// const connectionString = 'mongodb://127.0.0.1:27017';
+const Timer = require('./js/timer.js').Timer;
+const timer = new Timer();
 
 express.use('/public/', app.static(__dirname + '/public'));
 express.use('/module/', app.static(__dirname + '/node_modules'));
@@ -65,10 +67,10 @@ MongoClient.connect(connectionString, {useUnifiedTopology: true})
     // socket io
     io.on('connection', (socket) => {
         var token = '',
-            allReady = false,
-            countdown = 10;
+            allReady = false;
 
         socket.on('disconnect', () => {
+            console.log(token);
             var where = { token: token };
             var replace = { $set: {status: 0, ready: 0} };
             userCollection.updateOne(where, replace, (err, res) => {
@@ -108,23 +110,11 @@ MongoClient.connect(connectionString, {useUnifiedTopology: true})
                   allReady = false;
                   io.emit('user-all-notready');
                 }
+                console.log(allReady);
               });
             });
           });
         });
-
-
-        setInterval(function() {
-          if (allReady == true) {
-            setInterval(function() {
-              io.emit('timer', countdown);
-              countdown--;
-            }, 1000);
-          } else {
-            countdown = 10;
-          }
-        }, 1000);
-
 
         socket.on('send-text', (data) => {
             io.emit('user-send-text', data);
