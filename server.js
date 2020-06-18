@@ -7,10 +7,10 @@ const bodyParser = require('body-parser');
 const ejs = require('ejs');
 const randomstring = require('randomstring');
 const MongoClient = require('mongodb').MongoClient;
+const question = require('./data/question.json');
+
 const connectionString = 'mongodb://rifqi:kepolu123@127.0.0.1:27017';
 // const connectionString = 'mongodb://127.0.0.1:27017';
-const Timer = require('./js/timer.js').Timer;
-const timer = new Timer();
 
 express.use('/public/', app.static(__dirname + '/public'));
 express.use('/module/', app.static(__dirname + '/node_modules'));
@@ -70,7 +70,6 @@ MongoClient.connect(connectionString, {useUnifiedTopology: true})
             allReady = false;
 
         socket.on('disconnect', () => {
-            console.log(token);
             var where = { token: token };
             var replace = { $set: {status: 0, ready: 0} };
             userCollection.updateOne(where, replace, (err, res) => {
@@ -80,6 +79,7 @@ MongoClient.connect(connectionString, {useUnifiedTopology: true})
 
         socket.on('join-game' , (data) => {
             token = data.token;
+            console.log(data.token);
             var where = { token: token };
             var replace = { $set: {status: 1} };
             userCollection.updateOne(where, replace, function(err, res) {
@@ -105,12 +105,11 @@ MongoClient.connect(connectionString, {useUnifiedTopology: true})
 
                 if (activeUser == readyUser) {
                   allReady = true;
-                  io.emit('user-all-ready');
+                  io.emit('user-all-ready', question);
                 } else {
                   allReady = false;
                   io.emit('user-all-notready');
                 }
-                console.log(allReady);
               });
             });
           });
@@ -123,7 +122,7 @@ MongoClient.connect(connectionString, {useUnifiedTopology: true})
     // end socket io
 
   }).catch((err) => {
-    console.log(err);
+    res.send('error database');
   });
 
 http.listen(3000, () => {

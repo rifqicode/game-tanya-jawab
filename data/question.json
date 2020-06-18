@@ -1,0 +1,18 @@
+[
+  {
+    "question": "Pertanyaan Pertama",
+    "answer": [
+      { "text": "A", "score": 100 },
+      { "text": "B", "score": 0 },
+      { "text": "C", "score": 0 }
+    ]
+  },
+  {
+    "question": "Pertanyaan Kedua",
+    "answer": [
+      { "text": "A", "score": 0 },
+      { "text": "B", "score": 100 },
+      { "text": "C", "score": 0 }
+    ]
+  }
+]

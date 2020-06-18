@@ -1,68 +1,3 @@
-/* Center the book */
-.panel__image.panel__image--book {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    top: 60px;
-}
-
-/* .product-panel--book .panel__image--book {
-	position: absolute;
-	max-width: 500px;
-	top: calc(-5em - 5vw);
-	right: 0;
-}
-
-.product-panel .panel__image {
-	width: calc(30% + 2vw);
-	-ms-flex-order: 1;
-	order: 1;
-} */
-
-.article__content a:not(.btn):not(.toolbar-item) {
-	color: #006fc6;
-}
-
-.product-panel--book .panel__image--book img {
-	width: 100% !important;
-}
-
-.books__book__img {
-	width: 100%;
-	max-width: 20px;
-	will-change: transform;
-	transform-origin: 0 100%;
-	transform: rotate(-10deg);
-	transition: transform 0.3s ease-out;
-}
-
-.books__book__img:hover {
-    transform: rotate(0);
-}
-
-.author__image-wrapper::before,
-.books__book__image::before {
-    display: block;
-    content: "";
-    height: 20%;
-    width: 45%;
-    position: absolute;
-    background-image: url(https://i.imgur.com/5udcDlp.png);
-    background-size: 100% auto;
-    background-repeat: no-repeat;
-    top: 84%;
-    left: 35%;
-    right: 0;
-    transition: all 0.2s ease-out;
-    transform-origin: 30% 50%;
-    pointer-events: none;
-}
-
-.books__book__image:hover {
-    position: relative;
-}
-
 body {
   overflow: hidden;
 }
@@ -73,4 +8,34 @@ body {
 
 .player-status {
   margin-left: 5px;
+}
+
+.game-question {
+  color : #ffc16e;
+}
+
+.game-answer-unchecked {
+  background: #425fa0;
+  padding: 10px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border-radius: 33.2rem;
+  border: 1px solid;
+  padding: 10px;
+  box-shadow: 5px 10px;
+}
+
+.game-answer-checked {
+  background: #0d2454;
+  padding: 10px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border-radius: 33.2rem;
+  border: 1px solid;
+  padding: 10px;
+  box-shadow: 5px 10px;
+}
+
+.game-answer-unchecked:hover {
+  background: #0d2454;
 }
