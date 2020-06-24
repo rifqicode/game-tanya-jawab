@@ -23,7 +23,8 @@ express.use(bodyParser.urlencoded({
 express.use(bodyParser.json());
 
 // ------------------------------- MAIN -----------------------------------
-var $ipsConnected = [];
+var allPlayerConnect = [];
+var allPlayerScore = [];
 
 
 MongoClient.connect(connectionString, {useUnifiedTopology: true})
@@ -67,19 +68,21 @@ MongoClient.connect(connectionString, {useUnifiedTopology: true})
     // socket io
     io.on('connection', (socket) => {
         var token = '',
-            allReady = false;
+            allReady = false,
+            submitedScore = false;
 
         socket.on('disconnect', () => {
             var where = { token: token };
             var replace = { $set: {status: 0, ready: 0} };
             userCollection.updateOne(where, replace, (err, res) => {
               io.emit('user-disconnect', token);
+              allPlayerScore = [];
             });
         });
 
         socket.on('join-game' , (data) => {
             token = data.token;
-            console.log(data.token);
+
             var where = { token: token };
             var replace = { $set: {status: 1} };
             userCollection.updateOne(where, replace, function(err, res) {
@@ -117,6 +120,12 @@ MongoClient.connect(connectionString, {useUnifiedTopology: true})
 
         socket.on('send-text', (data) => {
             io.emit('user-send-text', data);
+        });
+
+        socket.on('submit-score', (data) => {
+            allPlayerScore.push(data);
+
+            io.emit('show-player-score', allPlayerScore);
         });
     });
     // end socket io

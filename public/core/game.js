@@ -15,6 +15,11 @@ let questionScore = 0;
 
 socket.emit('join-game', user);
 
+var gameInterval = setInterval(function(){
+  startGame()
+}, 1000);
+
+
 function message(data) {
     return `
       <li class="message left appeared">
@@ -74,6 +79,13 @@ function gameover() {
   $('#game-start').hide();
   $('#question-time').hide();
   $('#game-score').hide();
+  $('#game-player-score').show();
+
+  clearInterval(gameInterval);
+  socket.emit('submit-score', {
+    user : user,
+    score : allScore
+  });
 }
 
 function startGame() {
@@ -82,22 +94,23 @@ function startGame() {
 
         var gameContainer = $('#game-start'),
             gameQuestionTimer = $('#question-time'),
-            gameScore = $('#game-score-amount');
+            questionNumberNow = questionNumber-1;
 
         // game finish
-        if (maxQuestion == questionNumber) {
-          gameover();
-        }
 
         // lets start the game
         $('#game-ready-check').hide();
         $('#game-start').show();
         $('#question-time').show();
         $('#game-score').show();
+        $('#game-player-score').hide();
 
+        if (questionNumberNow == maxQuestion) {
+          gameover();
+        }
 
         if (gQuest == 0) {
-          var quest = generateQuestion(question[questionNumber-1]);
+          var quest = generateQuestion(question[questionNumberNow]);
           gameContainer.html(quest);
           gQuest = 1;
         }
@@ -109,8 +122,6 @@ function startGame() {
 
         if (timeEveryQuestion < 0) {
           allScore += questionScore;
-
-          gameScore.html(allScore);
 
           questionScore = 0;
           questionNumber++;
@@ -127,18 +138,12 @@ function startGame() {
       $('#game-ready-check').show();
       $('#game-start').hide();
       $('#question-time').hide();
-      $('#game-score').hide();
       $('#game-notice').html('Game akan dimulai jika seluruh pemain ready');
+      $('#game-player-score').hide();
+
       gameCountDown = 5;
     }
-
-    console.log(gameCountDown);
 }
-
-setInterval(function(){
-  startGame()
-}, 1000);
-
 socket.on('user-list', (data) => {
     $.each(data, (key, value) => {
       var playerCheck = $(`#${value.token}`).length;
@@ -183,6 +188,20 @@ socket.on('user-all-notready', (data) => {
     gameReady = false;
 });
 
+socket.on('show-player-score', (data) => {
+  var list = '<h3> Hasil Akhir </h3>';
+  $.each(data, (key, value) => {
+    list += `
+      <div class="col-md-12" style="margin-top:20px;">
+        <h5> ${key+1}. ${value.user.name}
+            <span class="btn btn-sm btn-primary"> ${value.score} </span>
+        </h5>
+      </div>
+    `;
+  });
+  $('#game-player-score').html(`<ul> ${list} </ul>`);
+});
+
 $(document).on('submit', '#send-message-form', (event) => {
     event.preventDefault();
     var text = $('#text').val();
@@ -217,8 +236,6 @@ $(document).on('click', '#ready-state', () => {
 
 function answerOnClick(div, score) {
     var content = $(div);
-
-    console.log(div,score);
 
     if (answer == 0) {
       content.removeClass('game-answer-unchecked');

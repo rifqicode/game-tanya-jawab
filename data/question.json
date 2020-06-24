@@ -11,6 +11,14 @@
     "question": "Pertanyaan Kedua",
     "answer": [
       { "text": "A", "score": 0 },
+      { "text": "B", "score": 0 },
+      { "text": "C", "score": 100 }
+    ]
+  },
+  {
+    "question": "Pertanyaan Ketiga",
+    "answer": [
+      { "text": "A", "score": 0 },
       { "text": "B", "score": 100 },
       { "text": "C", "score": 0 }
     ]
