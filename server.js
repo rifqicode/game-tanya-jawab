@@ -1,3 +1,5 @@
+'use strict';
+
 const app = require('express');
 const express = app();
 const http = require('http').createServer(express);
@@ -9,8 +11,9 @@ const randomstring = require('randomstring');
 const MongoClient = require('mongodb').MongoClient;
 const question = require('./data/question.json');
 
-const connectionString = 'mongodb://rifqi:kepolu123@127.0.0.1:27017';
+// const connectionString = 'mongodb://rifqi:kepolu123@127.0.0.1:27017';
 // const connectionString = 'mongodb://127.0.0.1:27017';
+const connectionString = "mongodb+srv://rifqi:kepolu123@cluster0-xc40y.mongodb.net/question-game?retryWrites=true&w=majority";
 
 express.use('/public/', app.static(__dirname + '/public'));
 express.use('/module/', app.static(__dirname + '/node_modules'));
@@ -132,8 +135,9 @@ MongoClient.connect(connectionString, {useUnifiedTopology: true})
 
   }).catch((err) => {
     res.send('error database');
+    console.log('database error');
   });
 
-http.listen(3000, () => {
-  console.log('express is running on port : 3000');
+http.listen(process.env.PORT || 5000, () => {
+  console.log('express is running on port : 5000');
 });
