@@ -1,3 +1,5 @@
+'use strict';
+
 const app = require('express');
 const express = app();
 const http = require('http').createServer(express);
