@@ -9,8 +9,9 @@ const randomstring = require('randomstring');
 const MongoClient = require('mongodb').MongoClient;
 const question = require('./data/question.json');
 
-const connectionString = 'mongodb://rifqi:kepolu123@127.0.0.1:27017';
+// const connectionString = 'mongodb://rifqi:kepolu123@127.0.0.1:27017';
 // const connectionString = 'mongodb://127.0.0.1:27017';
+const connectionString = "mongodb+srv://rifqi:kepolu123@cluster0-xc40y.mongodb.net/question-game?retryWrites=true&w=majority";
 
 express.use('/public/', app.static(__dirname + '/public'));
 express.use('/module/', app.static(__dirname + '/node_modules'));
