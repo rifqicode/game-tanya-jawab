@@ -2,6 +2,7 @@
 
 const app = require('express');
 const express = app();
+const dotenv = require('dotenv');
 const http = require('http').createServer(express);
 const io = require('socket.io')(http);
 const anime = require('animejs');
@@ -11,10 +12,8 @@ const randomstring = require('randomstring');
 const MongoClient = require('mongodb').MongoClient;
 const question = require('./data/question.json');
 
-// const connectionString = 'mongodb://rifqi:kepolu123@127.0.0.1:27017';
-// const connectionString = 'mongodb://127.0.0.1:27017';
-const connectionString = "mongodb+srv://rifqi:kepolu123@cluster0-xc40y.mongodb.net/question-game?retryWrites=true&w=majority";
 
+dotenv.config();
 express.use('/public/', app.static(__dirname + '/public'));
 express.use('/module/', app.static(__dirname + '/node_modules'));
 express.use(app.static(__dirname + '/public'));
@@ -30,10 +29,10 @@ var allPlayerConnect = [];
 var allPlayerScore = [];
 
 
-MongoClient.connect(connectionString, {useUnifiedTopology: true})
+MongoClient.connect(process.env.CONNECTION_STRING, {useUnifiedTopology: true})
   .then((client) => {
-    const db = client.db('question-game');
-    const userCollection = db.collection('users');
+    const db = client.db(process.env.MONGO_DATABASE);
+    const userCollection = db.collection(process.env.MONGO_COLLECTION);
 
     express.get('/', (req, res) => {
         res.render('index');
@@ -139,5 +138,5 @@ MongoClient.connect(connectionString, {useUnifiedTopology: true})
   });
 
 http.listen(process.env.PORT || 5000, () => {
-  console.log('express is running on port : 5000');
+  console.log(`express is running on port : ${process.env.PORT}`);
 });
