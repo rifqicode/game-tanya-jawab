@@ -133,6 +133,7 @@ MongoClient.connect(connectionString, {useUnifiedTopology: true})
 
   }).catch((err) => {
     res.send('error database');
+    console.log('database error');
   });
 
 http.listen(3000, () => {
