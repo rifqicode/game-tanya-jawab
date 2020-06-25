@@ -2,7 +2,6 @@
 
 const app = require('express');
 const express = app();
-const dotenv = require('dotenv');
 const http = require('http').createServer(express);
 const io = require('socket.io')(http);
 const anime = require('animejs');
@@ -11,9 +10,9 @@ const ejs = require('ejs');
 const randomstring = require('randomstring');
 const MongoClient = require('mongodb').MongoClient;
 const question = require('./data/question.json');
+const config = require('./module/config.js');
 
 
-dotenv.config();
 express.use('/public/', app.static(__dirname + '/public'));
 express.use('/module/', app.static(__dirname + '/node_modules'));
 express.use(app.static(__dirname + '/public'));
@@ -29,10 +28,10 @@ var allPlayerConnect = [];
 var allPlayerScore = [];
 
 
-MongoClient.connect(process.env.CONNECTION_STRING, {useUnifiedTopology: true})
+MongoClient.connect(config.connectionstring, {useUnifiedTopology: true})
   .then((client) => {
-    const db = client.db(process.env.MONGO_DATABASE);
-    const userCollection = db.collection(process.env.MONGO_COLLECTION);
+    const db = client.db(config.mongodb);
+    const userCollection = db.collection(config.mongocollection);
 
     express.get('/', (req, res) => {
         res.render('index');
@@ -137,6 +136,6 @@ MongoClient.connect(process.env.CONNECTION_STRING, {useUnifiedTopology: true})
     console.log('database error');
   });
 
-http.listen(process.env.PORT || 5000, () => {
-  console.log(`express is running on port : ${process.env.PORT}`);
+http.listen(config.PORT || 5000, () => {
+  console.log(`express is running on port : ${config.port}`);
 });
